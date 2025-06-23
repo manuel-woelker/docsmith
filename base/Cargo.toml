@@ -1,0 +1,17 @@
+[package]
+name = "docsmith-base"
+version = "0.1.0"
+edition = "2024"
+description = "A documentation generation tool - base crate"
+license = "Apache-2.0"
+
+[dependencies]
+error-stack = "0.5.0"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+arcstr = "1.2.0"
+
+
+[lints.clippy]
+# Causes false positives on context! macro
+redundant_closure = "allow"
