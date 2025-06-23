@@ -6,7 +6,7 @@ description = "A documentation generation tool - base crate"
 license = "Apache-2.0"
 
 [dependencies]
-error-stack = "0.5.0"
+anyhow = "1.0.98"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 arcstr = "1.2.0"

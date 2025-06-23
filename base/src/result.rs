@@ -10,17 +10,29 @@ macro_rules! context {
         (|| {
             $crate::result::info!($fmt $(, $($args),+)?);
             $($stmts)+
-        })().map_err(|e| $crate::error::DocsmithError::from(e).change_context(format!(concat!("Failed to ",$fmt) $(, $($args),+)?)))
+        })().map_err(|e| $crate::error::DocsmithError::from(e).context(format!(concat!("Failed to ",$fmt) $(, $($args),+)?)))
     };
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::context;
+    use crate::error::{DocsmithError, bail};
     use crate::result::DocsmithResult;
-    use crate::{bail, context};
     use std::env::set_var;
     use std::num::ParseFloatError;
     use std::str::FromStr;
+
+    #[test]
+    fn test_without_macro() {
+        let result: DocsmithResult<u32> = (|| {
+            bail!("foo");
+            //Err(std::io::Error::new(std::io::ErrorKind::NotFound, "foo"))
+        })()
+        .map_err(|e| DocsmithError::from(e).context("bar"));
+        let _err = result.unwrap_err();
+        //println!("Error: {:?}", _err);
+    }
 
     #[test]
     fn test_context_macro_ok() {

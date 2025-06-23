@@ -20,14 +20,7 @@ jobs:
       - name: Cargo version
         run: cargo --version
       - name: Build
-        run: cargo build
-      - name: Run Docsmith on itself
-        run: cargo run --package Docsmith
-      - name: Upload static files as artifact
-        id: deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: output/
+        run: cargo build --release --locked
   test:
     runs-on: ubuntu-24.04
     env:
