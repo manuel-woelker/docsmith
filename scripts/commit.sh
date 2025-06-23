@@ -4,7 +4,9 @@ set -euo pipefail
 
 cargo fmt
 cargo clippy -- -D warnings
-cargo test
+
+export RUST_BACKTRACE=1
+RUST_BACKTRACE=1 cargo test
 
 jj desc
 jj new

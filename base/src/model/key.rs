@@ -1,4 +1,5 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
+use std::hash::Hash;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -6,6 +7,12 @@ pub enum Key {
     //    U64(u64),
     String(Arc<String>),
     Str(&'static str),
+}
+
+impl Hash for Key {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.as_str().hash(state);
+    }
 }
 
 impl From<&'static str> for Key {
@@ -22,7 +29,13 @@ impl From<String> for Key {
 
 impl Debug for Key {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_str())
+        f.write_str(self.as_str())
+    }
+}
+
+impl Display for Key {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
     }
 }
 
