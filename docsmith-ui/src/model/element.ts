@@ -1,7 +1,7 @@
-export interface Element {
+export interface DocsmithElement {
   tag: string;
-  attributes: Map<string, Value> | undefined;
-  children: [Value] | undefined;
+  attributes?: Map<string, DocsmithValue> | undefined;
+  children?: [DocsmithValue] | undefined;
 }
 
-export type Value = string | Element;
+export type DocsmithValue = string | DocsmithElement;

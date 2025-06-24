@@ -1,7 +1,8 @@
+import {DocsmithElement} from "./element";
 
-export interface Document {
+export interface DocsmithDocument {
   title: string;
-  authors: [string];
-  body: Element;
+  authors: string[];
+  body: DocsmithElement;
 }
 

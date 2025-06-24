@@ -11,10 +11,3 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 render(() => <DocsmithApp />, root!);
-
-let path = "./document.js";
-import(/* @vite-ignore */ path).then((module) => {
-  let document = module.document;
-  window.document.title = document.title;
-
-});
