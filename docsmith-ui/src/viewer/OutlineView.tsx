@@ -1,5 +1,11 @@
+import {css} from "@emotion/css";
+
+const outlineClass = css`
+    padding: 30px 10px;
+`;
+
 export const OutlineView = () => {
-  return <div>OutlineView
+  return <div class={outlineClass}>OutlineView
     Foo<br/>
     Foo<br/>
     Foo<br/>

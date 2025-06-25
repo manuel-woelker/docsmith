@@ -4,30 +4,30 @@ import {OutlineView} from "./OutlineView";
 
 import { css } from '@emotion/css'
 
-const navbarHeight = "30";
+const navbarHeight = "40";
 const outlineWidth = "200";
 
 const containerClass = css`
-  background-color: red;
+  background-color: white;
   height: 100vh;
   width: 100vw;
 `;
 const navbarClass = css`
-    background-color: lavender;
+    margin: 0;
     position: absolute;
     width: 100%;
     height: ${navbarHeight}px;
+    box-shadow: 0px 0px 15px 5px #ddd;
 `;
 const outlineClass = css`
-    background-color: aquamarine;
     overflow-y: scroll;
+    scrollbar-width: thin;
     position: absolute;
     top: ${navbarHeight}px;
     width: ${outlineWidth}px;
     height: calc(100vh - ${navbarHeight}px);
 `;
 const contentClass = css`
-    background-color: blanchedalmond;
     overflow-y: scroll;
     position: absolute;
     top: ${navbarHeight}px;

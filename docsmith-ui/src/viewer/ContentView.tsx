@@ -1,5 +1,13 @@
+import {css} from "@emotion/css";
+
+const contentClass = css`
+    padding: 30px 10px;
+    scrollbar-width: thin;
+`;
+
+
 export const ContentView = () => {
-  return <div>ContentView
+  return <div class={contentClass}>ContentView
     Content<br/>
     Content<br/>
     Content<br/>
