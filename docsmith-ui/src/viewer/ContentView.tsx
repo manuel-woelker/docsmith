@@ -7,7 +7,11 @@ const contentClass = css`
 
 
 export const ContentView = () => {
-  return <div class={contentClass}>ContentView
+  return <div class={contentClass}>
+    <h1 class="title">Title</h1>
+    <h2 class="subtitle">Subtitle</h2>
+    
+    ContentView
     Content<br/>
     Content<br/>
     Content<br/>

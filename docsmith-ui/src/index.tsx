@@ -1,4 +1,7 @@
 /* @refresh reload */
+
+import "bulma/css/bulma.min.css";
+
 import { render } from 'solid-js/web';
 import {DocsmithApp} from "./viewer/DocsmithApp";
 

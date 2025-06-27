@@ -4,7 +4,7 @@ import {OutlineView} from "./OutlineView";
 
 import { css } from '@emotion/css'
 
-const navbarHeight = "40";
+const navbarHeight = "52";
 const outlineWidth = "200";
 
 const containerClass = css`
