@@ -12,6 +12,7 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 arcstr = "1.2.0"
 pulldown-cmark = "0.13.0"
 expect-test = "1.5.1"
+saphyr-parser = "0.0.6"
 
 [lints.clippy]
 # Causes false positives on context! macro

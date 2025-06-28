@@ -1,0 +1,8 @@
+[package]
+name = "docsmith-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+docsmith-base = {version = "0.1.0", path = "../base"}
+tracing = "0.1.37"

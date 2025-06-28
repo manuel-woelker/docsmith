@@ -1,5 +1,6 @@
 use crate::model::key::Key;
 use crate::model::value::Value;
+use crate::result::DocsmithResult;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Eq)]
@@ -40,6 +41,25 @@ impl Element {
 
     pub fn set_attribute(&mut self, key: impl Into<Key>, value: impl Into<Value>) {
         self.attributes.insert(key.into(), value.into());
+    }
+
+    pub fn walk(
+        &mut self,
+        mut f: impl FnMut(&mut Element) -> DocsmithResult<()>,
+    ) -> DocsmithResult<()> {
+        let mut stack = vec![self];
+        while let Some(top) = stack.pop() {
+            f(top)?;
+            for child in top.children_mut().iter_mut().rev() {
+                match child {
+                    Value::Element(element) => {
+                        stack.push(element);
+                    }
+                    Value::String(_) => { /*ignore*/ }
+                }
+            }
+        }
+        Ok(())
     }
 }
 
