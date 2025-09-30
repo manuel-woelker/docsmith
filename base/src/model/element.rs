@@ -1,6 +1,7 @@
 use crate::model::key::Key;
 use crate::model::value::Value;
 use crate::result::DocsmithResult;
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Eq)]
@@ -43,7 +44,7 @@ impl Element {
         self.attributes.insert(key.into(), value.into());
     }
 
-    pub fn walk(
+    pub fn walk_mut(
         &mut self,
         mut f: impl FnMut(&mut Element) -> DocsmithResult<()>,
     ) -> DocsmithResult<()> {
@@ -51,6 +52,22 @@ impl Element {
         while let Some(top) = stack.pop() {
             f(top)?;
             for child in top.children_mut().iter_mut().rev() {
+                match child {
+                    Value::Element(element) => {
+                        stack.push(element);
+                    }
+                    Value::String(_) => { /*ignore*/ }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub fn walk(&self, mut f: impl FnMut(&Element) -> DocsmithResult<()>) -> DocsmithResult<()> {
+        let mut stack = vec![self];
+        while let Some(top) = stack.pop() {
+            f(top)?;
+            for child in top.children().iter().rev() {
                 match child {
                     Value::Element(element) => {
                         stack.push(element);
@@ -72,7 +89,11 @@ fn fmt_element(
 
     indent += 2;
 
-    for (key, value) in &element.attributes {
+    for (key, value) in element
+        .attributes
+        .iter()
+        .sorted_by_key(|(key, _)| key.as_str())
+    {
         write!(f, "{:indent$}@{}: ", "", key, indent = indent)?;
         fmt_value(value, f, indent)?;
     }

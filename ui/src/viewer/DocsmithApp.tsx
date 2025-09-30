@@ -1,7 +1,7 @@
 import {MainView} from "./MainView";
 import {defaultDocument, DocumentContext} from "../stores/documentStore";
 import {createStore} from "solid-js/store";
-import {onMount} from "solid-js";
+import {createEffect, onMount} from "solid-js";
 
 export const DocsmithApp = () => {
   // Initialize store
@@ -11,7 +11,10 @@ export const DocsmithApp = () => {
     let module = await import(/* @vite-ignore */ path);
     let document = module.document;
     window.document.title = document.title;
-    setDocumentStore(module.document);
+    console.log(module.document);
+    createEffect(() => {
+      setDocumentStore(s => module.document);
+    });
   });
   return <DocumentContext.Provider value={documentStore}>
     <MainView />

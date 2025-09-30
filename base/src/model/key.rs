@@ -43,6 +43,10 @@ impl Key {
     pub fn as_str(&self) -> &str {
         self.as_ref()
     }
+
+    pub fn as_string(&self) -> String {
+        self.as_str().to_string()
+    }
 }
 
 impl Deref for Key {

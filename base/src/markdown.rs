@@ -74,7 +74,7 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
     let mut root = stack.pop().expect("stack empty");
     let metadata_key = &Key::from("metadata");
     // convert metadata
-    root.walk(|element| {
+    root.walk_mut(|element| {
         if element.tag() == metadata_key {
             let mut metadata_string = String::new();
             let children = std::mem::take(element.children_mut());
@@ -211,8 +211,8 @@ fizz: buzz
             expect!([r#"
                 root
                   metadata
-                    @foo: "bar"
                     @fizz: "buzz"
+                    @foo: "bar"
                   heading
                     @level: "2"
                     "two"
