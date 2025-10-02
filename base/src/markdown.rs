@@ -13,9 +13,9 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
     options.insert(Options::ENABLE_DEFINITION_LIST);
     options.insert(Options::ENABLE_YAML_STYLE_METADATA_BLOCKS);
     let parser = pulldown_cmark::Parser::new_ext(markdown, options);
-    let root = Element::new("root");
+    let root = Element::new_tag("root");
     let mut stack = vec![root];
-    for (event, _range) in parser.into_offset_iter() {
+    for (event, range) in parser.into_offset_iter() {
         match event {
             Event::Text(text) => {
                 stack
@@ -25,7 +25,9 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                     .push(Value::String(text.into_string()));
             }
             Event::Start(tag) => {
-                let mut element = Element::new("");
+                let mut element = Element::new();
+                element.span_mut().start = range.start;
+                element.span_mut().end = range.end;
                 let tag_name = match tag {
                     Tag::Paragraph => "paragraph",
                     Tag::Heading { level, .. } => {
@@ -33,6 +35,7 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                         "heading"
                     }
                     Tag::Strong => "strong",
+                    Tag::Emphasis => "emphasis",
                     Tag::HtmlBlock => "html_block",
                     Tag::Link { .. } => "link",
                     Tag::List(_firstitemnumber) => "list",
@@ -145,8 +148,8 @@ mod tests {
         test_parse(
             "",
             expect!([r#"
-            root
-        "#]),
+                root (0+0)
+            "#]),
         )
     }
 
@@ -155,10 +158,10 @@ mod tests {
         test_parse(
             "foobar",
             expect!([r#"
-            root
-              paragraph
-                "foobar"
-        "#]),
+                root (0+0)
+                  paragraph (0+6)
+                    "foobar"
+            "#]),
         )
     }
 
@@ -171,14 +174,14 @@ mod tests {
 
 "#,
             expect!([r#"
-    root
-      heading
-        @level: "1"
-        "one"
-      heading
-        @level: "2"
-        "two"
-"#]),
+                root (0+0)
+                  heading (0+6)
+                    @level: "1"
+                    "one"
+                  heading (7+7)
+                    @level: "2"
+                    "two"
+            "#]),
         )
     }
 
@@ -187,13 +190,28 @@ mod tests {
         test_parse(
             "foo **bar** baz",
             expect!([r#"
-            root
-              paragraph
-                "foo "
-                strong
-                  "bar"
-                " baz"
-        "#]),
+                root (0+0)
+                  paragraph (0+15)
+                    "foo "
+                    strong (4+7)
+                      "bar"
+                    " baz"
+            "#]),
+        )
+    }
+
+    #[test]
+    fn test_parse_mixed() -> DocsmithResult<()> {
+        test_parse(
+            "**foo bar _fizz buzz_**",
+            expect!([r#"
+                root (0+0)
+                  paragraph (0+23)
+                    strong (0+23)
+                      "foo bar "
+                      emphasis (10+11)
+                        "fizz buzz"
+            "#]),
         )
     }
 
@@ -209,11 +227,11 @@ fizz: buzz
 
 "#,
             expect!([r#"
-                root
-                  metadata
+                root (0+0)
+                  metadata (1+27)
                     @fizz: "buzz"
                     @foo: "bar"
-                  heading
+                  heading (29+7)
                     @level: "2"
                     "two"
             "#]),

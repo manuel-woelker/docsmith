@@ -1,22 +1,33 @@
 use crate::model::key::Key;
+use crate::model::span::Span;
 use crate::model::value::Value;
 use crate::result::DocsmithResult;
 use itertools::Itertools;
 use std::collections::HashMap;
 
-#[derive(PartialEq, Eq)]
 pub struct Element {
     tag: Key,
     attributes: HashMap<Key, Value>,
     children: Vec<Value>,
+    span: Span,
 }
 
 impl Element {
-    pub fn new(tag: impl Into<Key>) -> Element {
+    pub fn new_tag(tag: impl Into<Key>) -> Element {
         Element {
             tag: tag.into(),
             attributes: HashMap::new(),
             children: Vec::new(),
+            span: Span::new(0, 0, 0),
+        }
+    }
+
+    pub fn new() -> Element {
+        Element {
+            tag: Key::from("<unknown>"),
+            attributes: HashMap::new(),
+            children: Vec::new(),
+            span: Span::new(0, 0, 0),
         }
     }
 
@@ -42,6 +53,14 @@ impl Element {
 
     pub fn set_attribute(&mut self, key: impl Into<Key>, value: impl Into<Value>) {
         self.attributes.insert(key.into(), value.into());
+    }
+
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+
+    pub fn span_mut(&mut self) -> &mut Span {
+        &mut self.span
     }
 
     pub fn walk_mut(
@@ -80,12 +99,24 @@ impl Element {
     }
 }
 
+impl Default for Element {
+    fn default() -> Self {
+        Element::new()
+    }
+}
+
 fn fmt_element(
     element: &Element,
     f: &mut std::fmt::Formatter<'_>,
     mut indent: usize,
 ) -> std::fmt::Result {
-    writeln!(f, "{}", element.tag)?;
+    writeln!(
+        f,
+        "{} ({}+{})",
+        element.tag,
+        element.span.start,
+        element.span.end - element.span.start
+    )?;
 
     indent += 2;
 
@@ -133,19 +164,19 @@ mod tests {
         fn test_element(element: &Element, expected: Expect) {
             expected.assert_eq(&format!("{:?}", element));
         }
-        let mut element = Element::new("div");
+        let mut element = Element::new_tag("div");
         test_element(
             &element,
             expect![[r#"
-            div
-        "#]],
+                div (0+0)
+            "#]],
         );
 
         element.children_mut().push(Value::String("foo".into()));
         test_element(
             &element,
             expect![[r#"
-                div
+                div (0+0)
                   "foo"
             "#]],
         );
@@ -153,12 +184,12 @@ mod tests {
         element.children_mut().clear();
         element
             .children_mut()
-            .push(Value::Element(Element::new("link")));
+            .push(Value::Element(Element::new_tag("link")));
         test_element(
             &element,
             expect![[r#"
-                div
-                  link
+                div (0+0)
+                  link (0+0)
             "#]],
         );
 
@@ -169,13 +200,13 @@ mod tests {
         test_element(
             &element,
             expect![[r#"
-                div
+                div (0+0)
                   @class: "foo"
             "#]],
         );
 
         element.children_mut().clear();
-        let mut inner_element = Element::new("foo");
+        let mut inner_element = Element::new_tag("foo");
         inner_element
             .attributes
             .insert(Key::from("href"), Value::String("bar".into()));
@@ -186,8 +217,8 @@ mod tests {
         test_element(
             &element,
             expect![[r#"
-                div
-                  @class: foo
+                div (0+0)
+                  @class: foo (0+0)
                     @href: "bar"
                     "child"
             "#]],

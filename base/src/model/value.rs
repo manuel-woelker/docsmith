@@ -1,6 +1,6 @@
 use crate::model::element::Element;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum Value {
     String(String),
     Element(Element),
