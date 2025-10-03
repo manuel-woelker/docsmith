@@ -3,6 +3,7 @@ use std::hash::Hash;
 use std::ops::Deref;
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub enum Key {
     //    U64(u64),
     String(Arc<String>),

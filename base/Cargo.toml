@@ -14,7 +14,7 @@ pulldown-cmark = "0.13.0"
 saphyr-parser = "0.0.6"
 tinyjson = "=2.5.1"
 itertools = "0.14.0"
-
+pulldown-cmark-escape = "0.11.0"
 
 [dev-dependencies]
 expect-test = "1.5.1"
