@@ -3,7 +3,7 @@ use crate::model::key::Key;
 use crate::model::value::Value;
 use crate::result::DocsmithResult;
 use anyhow::bail;
-use pulldown_cmark::{Event, MetadataBlockKind, Options, Tag};
+use pulldown_cmark::{CodeBlockKind, Event, MetadataBlockKind, Options, Tag};
 
 pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
     let mut options = Options::empty();
@@ -37,7 +37,17 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                     Tag::Strong => "strong",
                     Tag::Emphasis => "emphasis",
                     Tag::HtmlBlock => "html_block",
-                    Tag::Link { .. } => "link",
+                    Tag::Link {
+                        link_type: _,
+                        dest_url,
+                        title,
+                        id,
+                    } => {
+                        element.set_attribute("href", dest_url);
+                        element.set_attribute("title", title);
+                        element.set_attribute("id", id);
+                        "link"
+                    }
                     Tag::List(_firstitemnumber) => "list",
                     Tag::Item => "item",
                     Tag::MetadataBlock(metadata) => {
@@ -48,6 +58,11 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                             }
                         }
                         "metadata"
+                    }
+                    Tag::CodeBlock(CodeBlockKind::Indented) => "code_block",
+                    Tag::CodeBlock(CodeBlockKind::Fenced(language)) => {
+                        element.set_attribute("language", language.into_string());
+                        "code_block"
                     }
                     _ => todo!("Implement tag: {:?}", tag),
                 };
@@ -70,6 +85,20 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
             }
             Event::Html(html) => {
                 dbg!(html);
+            }
+            Event::Code(code) => {
+                let mut element = Element::new();
+                element.span_mut().start = range.start;
+                element.span_mut().end = range.end;
+                element.set_tag("code");
+                element
+                    .children_mut()
+                    .push(Value::String(code.into_string()));
+                stack
+                    .last_mut()
+                    .expect("Top of stack is empty")
+                    .children_mut()
+                    .push(Value::Element(element));
             }
             other => todo!("Implement {:?}", other),
         }

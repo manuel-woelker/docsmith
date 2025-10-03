@@ -1,4 +1,7 @@
+use crate::html_exporter::convert_code_block::ConvertCodeBlock;
 use crate::html_exporter::convert_document::ConvertDocument;
+use crate::html_exporter::convert_heading::ConvertHeading;
+use crate::html_exporter::convert_link::ConvertLink;
 use crate::html_exporter::convert_passthru::ConvertPassthru;
 use crate::html_exporter::convert_simple::ConvertSimple;
 use crate::html_exporter::convert_tag::{ConversionContext, ConvertTag};
@@ -24,11 +27,18 @@ impl HtmlExporter {
         };
         exporter.register_converter("root", ConvertPassthru::new());
         exporter.register_converter("document", ConvertDocument::new());
+        exporter.register_converter("heading", ConvertHeading::new());
+        exporter.register_converter("link", ConvertLink::new());
+        exporter.register_converter("code_block", ConvertCodeBlock::new());
         let mut register_tag = |docsmith_tag: &'static str, html_tag: &'static str| {
             exporter.register_converter(docsmith_tag, ConvertSimple::new(html_tag));
         };
+
         register_tag("paragraph", "p");
         register_tag("strong", "strong");
+        register_tag("code", "code");
+        register_tag("list", "ul");
+        register_tag("item", "li");
         exporter
     }
 

@@ -51,6 +51,10 @@ impl Element {
         &self.attributes
     }
 
+    pub fn get_attribute(&self, key: impl Into<Key>) -> Option<&Value> {
+        self.attributes.get(&key.into())
+    }
+
     pub fn set_attribute(&mut self, key: impl Into<Key>, value: impl Into<Value>) {
         self.attributes.insert(key.into(), value.into());
     }
