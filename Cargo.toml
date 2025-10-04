@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["base", "cli"]
+members = ["base", "cli", "export-html", "model", "parser-markdown"]
 
 
 [profile.dev.package."*"]

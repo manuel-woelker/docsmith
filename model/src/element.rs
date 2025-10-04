@@ -1,7 +1,7 @@
-use crate::model::key::Key;
-use crate::model::span::Span;
-use crate::model::value::Value;
-use crate::result::DocsmithResult;
+use crate::key::Key;
+use crate::span::Span;
+use crate::value::Value;
+use docsmith_base::result::DocsmithResult;
 use itertools::Itertools;
 use std::collections::HashMap;
 

@@ -1,6 +1,6 @@
-use crate::model::element::Element;
-use crate::model::value::Value;
-use crate::result::DocsmithResult;
+use crate::element::Element;
+use crate::value::Value;
+use docsmith_base::result::DocsmithResult;
 use std::collections::HashMap;
 use tinyjson::JsonValue;
 

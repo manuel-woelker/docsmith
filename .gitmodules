@@ -1,0 +1,18 @@
+[submodule "sample-documents/kogakure"]
+	path = sample-documents/kogakure
+	url = git@github.com:kogakure/website-11ty-kogakure.de.git
+[submodule "sample-documents/progit2"]
+	path = sample-documents/progit2
+	url = git@github.com:progit/progit2.git
+[submodule "sample-documents/learn-javascript"]
+	path = sample-documents/learn-javascript
+	url = git@github.com:sumn2u/learn-javascript.git
+[submodule "sample-documents/algorithm-archive"]
+	path = sample-documents/algorithm-archive
+	url = git@github.com:algorithm-archivists/algorithm-archive.git
+[submodule "sample-documents/rust-embedded-book"]
+	path = sample-documents/rust-embedded-book
+	url = git@github.com:rust-embedded/book.git
+[submodule "sample-documents/rust-embedded-discovery"]
+	path = sample-documents/rust-embedded-discovery
+	url = git@github.com:rust-embedded/discovery.git

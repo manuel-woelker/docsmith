@@ -31,9 +31,9 @@ checksum = "7d902e3d592a523def97af8f317b08ce16b7ab854c1985a0c671e6f15cebc236"
 
 [[package]]
 name = "bitflags"
-version = "2.9.1"
+version = "2.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967"
+checksum = "2261d10cca569e4643e526d8dc2e62e433cc8aba21ab764233731f8d369bf394"
 
 [[package]]
 name = "cfg-if"
@@ -54,11 +54,6 @@ dependencies = [
  "anyhow",
  "arcstr",
  "expect-test",
- "itertools",
- "pulldown-cmark",
- "pulldown-cmark-escape",
- "saphyr-parser",
- "tinyjson",
  "tracing",
  "tracing-subscriber",
 ]
@@ -68,7 +63,43 @@ name = "docsmith-cli"
 version = "0.1.0"
 dependencies = [
  "docsmith-base",
+ "docsmith-export-html",
+ "docsmith-model",
+ "docsmith-parser-markdown",
  "tracing",
+]
+
+[[package]]
+name = "docsmith-export-html"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "docsmith-model",
+ "docsmith-parser-markdown",
+ "expect-test",
+ "pulldown-cmark-escape",
+]
+
+[[package]]
+name = "docsmith-model"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "expect-test",
+ "itertools",
+ "tinyjson",
+]
+
+[[package]]
+name = "docsmith-parser-markdown"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "docsmith-model",
+ "expect-test",
+ "pulldown-cmark",
+ "saphyr-parser",
+ "tinyjson",
 ]
 
 [[package]]
@@ -95,18 +126,18 @@ checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
 
 [[package]]
 name = "getopts"
-version = "0.2.23"
+version = "0.2.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cba6ae63eb948698e300f645f87c70f76630d505f23b8907cf1e193ee85048c1"
+checksum = "cfe4fbac503b8d1f88e6676011885f34b7174f46e59956bba534ba83abded4df"
 dependencies = [
  "unicode-width",
 ]
 
 [[package]]
 name = "hashbrown"
-version = "0.15.4"
+version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5971ac85611da7067dbfcabef3c70ebb5606018acd9e2a3903a0da507521e0d5"
+checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
 dependencies = [
  "foldhash",
 ]

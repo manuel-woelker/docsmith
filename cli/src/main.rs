@@ -1,5 +1,5 @@
 use docsmith_base::logging::init_logging;
-use docsmith_base::markdown::parse_markdown;
+use docsmith_parser_markdown::markdown::parse_markdown;
 use std::fs::read_to_string;
 use std::time::Instant;
 use tracing::info;
@@ -15,7 +15,7 @@ fn main() {
     //let json = element_to_json(&root_element).unwrap();
     // println!("{}", json);
     let mut output_file = std::fs::File::create("target/output.html").unwrap();
-    let exporter = docsmith_base::html_exporter::HtmlExporter::new();
+    let exporter = docsmith_export_html::html_exporter::HtmlExporter::new();
     exporter
         .export_to_html(&mut output_file, &root_element)
         .unwrap();

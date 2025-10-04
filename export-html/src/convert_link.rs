@@ -1,6 +1,6 @@
-use crate::html_exporter::convert_tag::{ConversionContext, ConvertTag};
-use crate::model::value::Value;
-use crate::result::DocsmithResult;
+use crate::convert_tag::{ConversionContext, ConvertTag};
+use docsmith_base::result::DocsmithResult;
+use docsmith_model::value::Value;
 use std::io::Write;
 
 #[derive(Default)]

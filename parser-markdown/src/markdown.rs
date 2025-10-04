@@ -1,8 +1,8 @@
-use crate::model::element::Element;
-use crate::model::key::Key;
-use crate::model::value::Value;
-use crate::result::DocsmithResult;
-use anyhow::bail;
+use docsmith_base::error::bail;
+use docsmith_base::result::DocsmithResult;
+use docsmith_model::element::Element;
+use docsmith_model::key::Key;
+use docsmith_model::value::Value;
 use pulldown_cmark::{CodeBlockKind, Event, MetadataBlockKind, Options, Tag};
 
 pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
@@ -43,9 +43,9 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                         title,
                         id,
                     } => {
-                        element.set_attribute("href", dest_url);
-                        element.set_attribute("title", title);
-                        element.set_attribute("id", id);
+                        element.set_attribute("href", dest_url.to_string());
+                        element.set_attribute("title", title.to_string());
+                        element.set_attribute("id", id.to_string());
                         "link"
                     }
                     Tag::List(_firstitemnumber) => "list",
@@ -163,7 +163,7 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
 #[cfg(test)]
 mod tests {
     use super::parse_markdown;
-    use crate::result::DocsmithResult;
+    use docsmith_base::result::DocsmithResult;
     use expect_test::{Expect, expect};
 
     fn test_parse(markdown: &str, expected: Expect) -> DocsmithResult<()> {

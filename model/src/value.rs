@@ -1,5 +1,4 @@
-use crate::model::element::Element;
-use pulldown_cmark::CowStr;
+use crate::element::Element;
 
 #[derive(Debug)]
 pub enum Value {
@@ -20,12 +19,6 @@ impl Value {
 impl From<String> for Value {
     fn from(value: String) -> Value {
         Value::String(value)
-    }
-}
-
-impl<'a> From<CowStr<'a>> for Value {
-    fn from(value: CowStr<'a>) -> Self {
-        value.to_string().into()
     }
 }
 

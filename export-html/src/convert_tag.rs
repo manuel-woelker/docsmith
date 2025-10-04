@@ -1,5 +1,5 @@
-use crate::model::element::Element;
-use crate::result::DocsmithResult;
+use docsmith_base::result::DocsmithResult;
+use docsmith_model::element::Element;
 use std::io::Write;
 
 pub struct ConversionContext<'a> {

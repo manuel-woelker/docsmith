@@ -1,9 +1,9 @@
-use crate::html_exporter::convert_tag::{ConversionContext, ConvertTag};
-use crate::result::DocsmithResult;
+use crate::convert_tag::{ConversionContext, ConvertTag};
+use docsmith_base::result::DocsmithResult;
 use std::borrow::Cow;
 use std::io::Write;
 
-const CSS: &str = include_str!("../css/pico.classless.jade.css");
+const CSS: &str = include_str!("css/pico.classless.jade.css");
 
 #[derive(Default)]
 pub struct ConvertDocument {

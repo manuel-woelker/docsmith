@@ -1,5 +1,5 @@
-use crate::html_exporter::convert_tag::{ConversionContext, ConvertTag};
-use crate::result::DocsmithResult;
+use crate::convert_tag::{ConversionContext, ConvertTag};
+use docsmith_base::result::DocsmithResult;
 use std::io::Write;
 
 #[derive(Default)]
