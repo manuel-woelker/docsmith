@@ -16,10 +16,10 @@ impl ConvertSimple {
 }
 
 impl ConvertTag for ConvertSimple {
-    fn emit_before<'a>(
+    fn emit_before(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         write!(write, "<{}>", self.html_tag)?;
         Ok(())
@@ -28,7 +28,7 @@ impl ConvertTag for ConvertSimple {
     fn emit_after<'a>(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         write!(write, "</{}>", self.html_tag)?;
         Ok(())

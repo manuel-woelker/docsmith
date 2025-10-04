@@ -20,21 +20,17 @@ impl ConvertHeading {
 }
 
 impl ConvertTag for ConvertHeading {
-    fn emit_before<'a>(
+    fn emit_before(
         &self,
         write: &mut dyn Write,
-        context: &ConversionContext<'a>,
+        context: &ConversionContext,
     ) -> DocsmithResult<()> {
         let level = Self::get_level(context);
         write!(write, "<h{}>", level)?;
         Ok(())
     }
 
-    fn emit_after<'a>(
-        &self,
-        write: &mut dyn Write,
-        context: &ConversionContext<'a>,
-    ) -> DocsmithResult<()> {
+    fn emit_after(&self, write: &mut dyn Write, context: &ConversionContext) -> DocsmithResult<()> {
         let level = Self::get_level(context);
         write!(write, "</h{}>", level)?;
         Ok(())

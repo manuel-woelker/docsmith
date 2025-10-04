@@ -25,10 +25,10 @@ impl ConvertDocument {
 }
 
 impl ConvertTag for ConvertDocument {
-    fn emit_before<'a>(
+    fn emit_before(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         writeln!(write, "<!DOCTYPE html>")?;
         writeln!(write, "<html>")?;
@@ -44,10 +44,10 @@ impl ConvertTag for ConvertDocument {
         Ok(())
     }
 
-    fn emit_after<'a>(
+    fn emit_after(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         writeln!(write, "</main>")?;
         writeln!(write, "</body>")?;

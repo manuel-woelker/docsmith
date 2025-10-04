@@ -13,14 +13,7 @@ impl<'a> ConversionContext<'a> {
 }
 
 pub trait ConvertTag {
-    fn emit_before<'a>(
-        &self,
-        write: &mut dyn Write,
-        context: &ConversionContext<'a>,
-    ) -> DocsmithResult<()>;
-    fn emit_after<'a>(
-        &self,
-        write: &mut dyn Write,
-        context: &ConversionContext<'a>,
-    ) -> DocsmithResult<()>;
+    fn emit_before(&self, write: &mut dyn Write, context: &ConversionContext)
+    -> DocsmithResult<()>;
+    fn emit_after(&self, write: &mut dyn Write, context: &ConversionContext) -> DocsmithResult<()>;
 }

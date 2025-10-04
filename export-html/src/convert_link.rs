@@ -13,10 +13,10 @@ impl ConvertLink {
 }
 
 impl ConvertTag for ConvertLink {
-    fn emit_before<'a>(
+    fn emit_before(
         &self,
         write: &mut dyn Write,
-        context: &ConversionContext<'a>,
+        context: &ConversionContext,
     ) -> DocsmithResult<()> {
         if let Some(href) = context.element.get_attribute("href").map(Value::as_string) {
             write!(write, "<a href=\"{}\">", href)?;
@@ -26,10 +26,10 @@ impl ConvertTag for ConvertLink {
         Ok(())
     }
 
-    fn emit_after<'a>(
+    fn emit_after(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         write!(write, "</a>")?;
         Ok(())

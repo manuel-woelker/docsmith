@@ -12,19 +12,19 @@ impl ConvertCodeBlock {
 }
 
 impl ConvertTag for ConvertCodeBlock {
-    fn emit_before<'a>(
+    fn emit_before(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         write!(write, "<pre><code>")?;
         Ok(())
     }
 
-    fn emit_after<'a>(
+    fn emit_after(
         &self,
         write: &mut dyn Write,
-        _context: &ConversionContext<'a>,
+        _context: &ConversionContext,
     ) -> DocsmithResult<()> {
         write!(write, "</code></pre>")?;
         Ok(())
