@@ -9,6 +9,7 @@ docsmith-model = {version = "0.1.0", path = "../model"}
 pulldown-cmark = "0.13.0"
 saphyr-parser = "0.0.6"
 tinyjson = "=2.5.1"
+indenter = "0.3.4"
 
 [dev-dependencies]
 expect-test = "1.5.1"
