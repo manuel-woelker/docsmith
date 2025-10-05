@@ -1,4 +1,5 @@
 use docsmith_base::logging::init_logging;
+use docsmith_model::tags;
 use docsmith_parser_markdown::markdown::parse_markdown;
 use std::fs::read_to_string;
 use std::time::Instant;
@@ -10,7 +11,7 @@ fn main() {
     let start = Instant::now();
     let file_content = read_to_string("sample-documents/rust-rfc-0069-ascii-literals.md").unwrap();
     let mut root_element = parse_markdown(&file_content).unwrap();
-    root_element.set_tag("document");
+    root_element.set_tag(tags::ARTICLE);
     //dbg!(&root_element);
     //let json = element_to_json(&root_element).unwrap();
     // println!("{}", json);

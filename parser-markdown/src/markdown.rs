@@ -3,6 +3,7 @@ use docsmith_base::result::DocsmithResult;
 use docsmith_model::element::Element;
 use docsmith_model::key::Key;
 use docsmith_model::value::Value;
+use docsmith_model::{attributes, tags};
 use pulldown_cmark::{CodeBlockKind, Event, MetadataBlockKind, Options, Tag};
 
 pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
@@ -13,7 +14,7 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
     options.insert(Options::ENABLE_DEFINITION_LIST);
     options.insert(Options::ENABLE_YAML_STYLE_METADATA_BLOCKS);
     let parser = pulldown_cmark::Parser::new_ext(markdown, options);
-    let root = Element::new_tag("root");
+    let root = tags::DOCUMENT.new_element();
     let mut stack = vec![root];
     for (event, range) in parser.into_offset_iter() {
         match event {
@@ -28,28 +29,30 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                 let mut element = Element::new();
                 element.span_mut().start = range.start;
                 element.span_mut().end = range.end;
-                let tag_name = match tag {
-                    Tag::Paragraph => "paragraph",
+                let tag = match tag {
+                    Tag::Paragraph => tags::PARAGRAPH,
                     Tag::Heading { level, .. } => {
-                        element.set_attribute("level", format!("{}", level as usize));
-                        "heading"
+                        element
+                            .set_attribute(attributes::HEADING_LEVEL, (level as usize).to_string());
+                        tags::HEADING
                     }
-                    Tag::Strong => "strong",
-                    Tag::Emphasis => "emphasis",
-                    Tag::HtmlBlock => "html_block",
+                    Tag::Strong => tags::STRONG,
+                    Tag::Emphasis => tags::EMPHASIS,
+                    Tag::HtmlBlock => tags::HTML,
                     Tag::Link {
                         link_type: _,
                         dest_url,
                         title,
                         id,
                     } => {
-                        element.set_attribute("href", dest_url.to_string());
-                        element.set_attribute("title", title.to_string());
-                        element.set_attribute("id", id.to_string());
-                        "link"
+                        element
+                            .set_attribute(attributes::LINK_DESTINATION_URL, dest_url.to_string());
+                        element.set_attribute(attributes::LINK_TILE, title.to_string());
+                        element.set_attribute(attributes::ID, id.to_string());
+                        tags::LINK
                     }
-                    Tag::List(_firstitemnumber) => "list",
-                    Tag::Item => "item",
+                    Tag::List(_firstitemnumber) => tags::LIST,
+                    Tag::Item => tags::ITEM,
                     Tag::MetadataBlock(metadata) => {
                         match metadata {
                             MetadataBlockKind::YamlStyle => { /* supported */ }
@@ -57,16 +60,17 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                                 todo!("Unsupported metadata style: {:?}", metadata);
                             }
                         }
-                        "metadata"
+                        tags::METADATA
                     }
-                    Tag::CodeBlock(CodeBlockKind::Indented) => "code_block",
+                    Tag::CodeBlock(CodeBlockKind::Indented) => tags::CODE_BLOCK,
                     Tag::CodeBlock(CodeBlockKind::Fenced(language)) => {
-                        element.set_attribute("language", language.into_string());
-                        "code_block"
+                        element
+                            .set_attribute(attributes::CODEBLOCK_LANGUAGE, language.into_string());
+                        tags::CODE_BLOCK
                     }
                     _ => todo!("Implement tag: {:?}", tag),
                 };
-                element.set_tag(tag_name);
+                element.set_tag(tag);
                 stack.push(element);
             }
             Event::End(_tag_end) => {
@@ -87,10 +91,9 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
                 dbg!(html);
             }
             Event::Code(code) => {
-                let mut element = Element::new();
+                let mut element = tags::CODE.new_element();
                 element.span_mut().start = range.start;
                 element.span_mut().end = range.end;
-                element.set_tag("code");
                 element
                     .children_mut()
                     .push(Value::String(code.into_string()));
@@ -104,10 +107,9 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
         }
     }
     let mut root = stack.pop().expect("stack empty");
-    let metadata_key = &Key::from("metadata");
     // convert metadata
     root.walk_mut(|element| {
-        if element.tag() == metadata_key {
+        if element.tag() == &tags::METADATA {
             let mut metadata_string = String::new();
             let children = std::mem::take(element.children_mut());
             for child in children {
@@ -177,7 +179,7 @@ mod tests {
         test_parse(
             "",
             expect!([r#"
-                root (0+0)
+                document (0+0)
             "#]),
         )
     }
@@ -187,7 +189,7 @@ mod tests {
         test_parse(
             "foobar",
             expect!([r#"
-                root (0+0)
+                document (0+0)
                   paragraph (0+6)
                     "foobar"
             "#]),
@@ -203,7 +205,7 @@ mod tests {
 
 "#,
             expect!([r#"
-                root (0+0)
+                document (0+0)
                   heading (0+6)
                     @level: "1"
                     "one"
@@ -219,7 +221,7 @@ mod tests {
         test_parse(
             "foo **bar** baz",
             expect!([r#"
-                root (0+0)
+                document (0+0)
                   paragraph (0+15)
                     "foo "
                     strong (4+7)
@@ -234,7 +236,7 @@ mod tests {
         test_parse(
             "**foo bar _fizz buzz_**",
             expect!([r#"
-                root (0+0)
+                document (0+0)
                   paragraph (0+23)
                     strong (0+23)
                       "foo bar "
@@ -256,7 +258,7 @@ fizz: buzz
 
 "#,
             expect!([r#"
-                root (0+0)
+                document (0+0)
                   metadata (1+27)
                     @fizz: "buzz"
                     @foo: "bar"

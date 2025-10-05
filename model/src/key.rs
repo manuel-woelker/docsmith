@@ -1,3 +1,4 @@
+use crate::element::Element;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use std::ops::Deref;
@@ -41,6 +42,14 @@ impl Display for Key {
 }
 
 impl Key {
+    pub const fn from_static(value: &'static str) -> Self {
+        Key::Str(value)
+    }
+
+    pub fn new_element(&self) -> Element {
+        Element::new_tag(self.clone())
+    }
+
     pub fn as_str(&self) -> &str {
         self.as_ref()
     }

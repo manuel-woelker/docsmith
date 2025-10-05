@@ -8,6 +8,7 @@ use crate::convert_tag::{ConversionContext, ConvertTag};
 use docsmith_base::result::DocsmithResult;
 use docsmith_model::element::Element;
 use docsmith_model::key::Key;
+use docsmith_model::tags;
 use docsmith_model::value::Value;
 use pulldown_cmark_escape::{IoWriter, escape_html_body_text};
 use std::cell::RefCell;
@@ -25,20 +26,20 @@ impl HtmlExporter {
             converter_map: HashMap::new(),
             unhandled_tags: RefCell::new(HashSet::new()),
         };
-        exporter.register_converter("root", ConvertPassthru::new());
-        exporter.register_converter("document", ConvertDocument::new());
-        exporter.register_converter("heading", ConvertHeading::new());
-        exporter.register_converter("link", ConvertLink::new());
-        exporter.register_converter("code_block", ConvertCodeBlock::new());
-        let mut register_tag = |docsmith_tag: &'static str, html_tag: &'static str| {
+        exporter.register_converter(tags::DOCUMENT, ConvertPassthru::new());
+        exporter.register_converter(tags::ARTICLE, ConvertDocument::new());
+        exporter.register_converter(tags::HEADING, ConvertHeading::new());
+        exporter.register_converter(tags::LINK, ConvertLink::new());
+        exporter.register_converter(tags::CODE_BLOCK, ConvertCodeBlock::new());
+        let mut register_tag = |docsmith_tag: Key, html_tag: &'static str| {
             exporter.register_converter(docsmith_tag, ConvertSimple::new(html_tag));
         };
 
-        register_tag("paragraph", "p");
-        register_tag("strong", "strong");
-        register_tag("code", "code");
-        register_tag("list", "ul");
-        register_tag("item", "li");
+        register_tag(tags::PARAGRAPH, "p");
+        register_tag(tags::STRONG, "strong");
+        register_tag(tags::CODE, "code");
+        register_tag(tags::LIST, "ul");
+        register_tag(tags::ITEM, "li");
         exporter
     }
 
