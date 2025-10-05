@@ -16,6 +16,10 @@ impl Summary {
             entries: Vec::new(),
         }
     }
+
+    pub fn entries(&self) -> &[SummaryEntry] {
+        &self.entries
+    }
 }
 
 impl Debug for Summary {
@@ -43,6 +47,18 @@ impl SummaryEntry {
             path,
             children: Vec::new(),
         }
+    }
+
+    pub fn title(&self) -> &str {
+        &self.title
+    }
+
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
+    pub fn children(&self) -> &[SummaryEntry] {
+        &self.children
     }
 }
 
@@ -75,6 +91,9 @@ pub fn parse_summary(input: &str) -> DocsmithResult<Summary> {
                 stack.push(SummaryEntry::new("".to_string(), "".to_string()));
             }
             Event::Text(text) => {
+                link_text.push_str(&text);
+            }
+            Event::Code(text) => {
                 link_text.push_str(&text);
             }
             Event::Start(Tag::Link { dest_url, .. }) => {
@@ -143,17 +162,23 @@ mod tests {
  - [fizz](fizz.md)
    - [buzz](buzz.md)
      - [bizz](bizz.md)
+     - [`code`](code.md)
+     - [*emph*](code.md)
+     - [**strong**](code.md)
         "#,
             expect![[r#"
-            Summary:
-                foo: foo.md
-                    bar: bar.md
-                    baz: baz.md
-                fizz: fizz.md
-                    buzz: buzz.md
-                        bizz: bizz.md
+                Summary:
+                    foo: foo.md
+                        bar: bar.md
+                        baz: baz.md
+                    fizz: fizz.md
+                        buzz: buzz.md
+                            bizz: bizz.md
+                            code: code.md
+                            emph: code.md
+                            strong: code.md
 
-        "#]],
+            "#]],
         );
     }
 

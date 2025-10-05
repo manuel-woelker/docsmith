@@ -65,7 +65,9 @@ dependencies = [
  "docsmith-base",
  "docsmith-export-html",
  "docsmith-model",
+ "docsmith-pal-real",
  "docsmith-parser-markdown",
+ "docsmith-transformer",
  "tracing",
 ]
 
@@ -91,6 +93,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "docsmith-pal"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "relative-path",
+]
+
+[[package]]
+name = "docsmith-pal-mock"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "docsmith-pal",
+ "expect-test",
+]
+
+[[package]]
+name = "docsmith-pal-real"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "docsmith-pal",
+ "expect-test",
+]
+
+[[package]]
 name = "docsmith-parser-markdown"
 version = "0.1.0"
 dependencies = [
@@ -101,6 +129,18 @@ dependencies = [
  "pulldown-cmark",
  "saphyr-parser",
  "tinyjson",
+]
+
+[[package]]
+name = "docsmith-transformer"
+version = "0.1.0"
+dependencies = [
+ "docsmith-base",
+ "docsmith-export-html",
+ "docsmith-model",
+ "docsmith-pal",
+ "docsmith-pal-mock",
+ "docsmith-parser-markdown",
 ]
 
 [[package]]
@@ -304,6 +344,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
+name = "relative-path"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bca40a312222d8ba74837cb474edef44b37f561da5f773981007a10bbaa992b0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "saphyr-parser"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -311,6 +360,35 @@ checksum = "4fb771b59f6b1985d1406325ec28f97cfb14256abcec4fdfb37b36a1766d6af7"
 dependencies = [
  "arraydeque",
  "hashlink",
+]
+
+[[package]]
+name = "serde"
+version = "1.0.228"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "serde_core"
+version = "1.0.228"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.228"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

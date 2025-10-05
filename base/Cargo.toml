@@ -12,7 +12,8 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 arcstr = "1.2.0"
 
 [dev-dependencies]
-expect-test = "1.5.1"
+expect-test = { workspace = true }
+
 
 [lints.clippy]
 # Causes false positives on context! macro

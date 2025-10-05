@@ -1,0 +1,12 @@
+[package]
+name = "docsmith-pal-real"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "src/pal_real.rs"
+
+[dependencies]
+docsmith-base = {version = "0.1.0", path = "../base"}
+docsmith-pal = {version = "0.1.0", path = "../pal"}
+expect-test = { workspace = true }

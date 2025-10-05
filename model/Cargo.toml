@@ -9,4 +9,4 @@ itertools = "0.14.0"
 tinyjson = "2.5.1"
 
 [dev-dependencies]
-expect-test = "1.5.1"
+expect-test = { workspace = true }

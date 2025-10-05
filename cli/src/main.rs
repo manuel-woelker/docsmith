@@ -1,7 +1,6 @@
 use docsmith_base::logging::init_logging;
-use docsmith_model::tags;
-use docsmith_parser_markdown::markdown::parse_markdown;
-use std::fs::read_to_string;
+use docsmith_pal_real::PalReal;
+use docsmith_transformer::transformer::Transformer;
 use std::time::Instant;
 use tracing::info;
 
@@ -9,7 +8,7 @@ fn main() {
     init_logging();
     info!("docsmith");
     let start = Instant::now();
-    let file_content = read_to_string("sample-documents/rust-rfc-0069-ascii-literals.md").unwrap();
+    /*    let file_content = read_to_string("sample-documents/rust-rfc-0069-ascii-literals.md").unwrap();
     let mut root_element = parse_markdown(&file_content).unwrap();
     root_element.set_tag(tags::ARTICLE);
     //dbg!(&root_element);
@@ -22,7 +21,14 @@ fn main() {
         .unwrap();
     for unhandled_tag in exporter.unhandled_tags() {
         println!("Unhandled tag: {}", unhandled_tag);
-    }
+    }*/
+    let transformer = Transformer::new(PalReal::new());
+    transformer
+        .transform_book(
+            "sample-documents/rust-embedded-book/src/SUMMARY.md",
+            "target/rust-embedded-book.html",
+        )
+        .unwrap();
     let duration = start.elapsed();
     println!("Duration: {} ms", duration.as_millis());
 }

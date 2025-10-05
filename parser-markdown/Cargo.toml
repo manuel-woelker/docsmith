@@ -12,4 +12,5 @@ tinyjson = "=2.5.1"
 indenter = "0.3.4"
 
 [dev-dependencies]
-expect-test = "1.5.1"
+expect-test = { workspace = true }
+

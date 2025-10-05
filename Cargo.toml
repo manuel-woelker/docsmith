@@ -1,6 +1,10 @@
 [workspace]
 resolver = "3"
-members = ["base", "cli", "export-html", "model", "parser-markdown"]
+members = ["base", "cli", "transformer", "export-html", "pal_mock", "model", "pal", "pal_mock", "parser-markdown", "pal_real"]
+
+
+[workspace.dependencies]
+expect-test = "1.5.1"
 
 
 [profile.dev.package."*"]
