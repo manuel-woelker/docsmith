@@ -3,6 +3,10 @@ name = "docsmith-cli"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "docsmith_cli"
+path = "src/docsmith_cli.rs"
+
 [dependencies]
 docsmith-base = {version = "0.1.0", path = "../base"}
 docsmith-pal-real = {version = "0.1.0", path = "../pal_real"}

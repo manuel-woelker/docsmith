@@ -4,7 +4,9 @@ use crate::value::Value;
 use docsmith_base::result::DocsmithResult;
 use itertools::Itertools;
 use std::collections::HashMap;
+use std::fmt::Display;
 
+#[derive(Clone)]
 pub struct Element {
     tag: Key,
     attributes: HashMap<Key, Value>,
@@ -106,6 +108,15 @@ impl Element {
 impl Default for Element {
     fn default() -> Self {
         Element::new()
+    }
+}
+
+impl Display for Element {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for child in &self.children {
+            Display::fmt(child, f)?;
+        }
+        Ok(())
     }
 }
 

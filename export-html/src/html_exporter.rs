@@ -67,7 +67,24 @@ impl HtmlExporter {
         self.export_element(write, document)
     }
 
-    fn export_element(&self, mut write: &mut dyn Write, element: &Element) -> DocsmithResult<()> {
+    pub fn export_value_to_html(
+        &self,
+        mut write: &mut dyn Write,
+        value: &Value,
+    ) -> DocsmithResult<()> {
+        match value {
+            Value::Element(element) => {
+                self.export_element(write, element)?;
+            }
+            Value::String(text) => {
+                let mut writer = IoWriter(&mut write);
+                escape_html_body_text(&mut writer, text)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn export_element(&self, write: &mut dyn Write, element: &Element) -> DocsmithResult<()> {
         let converter = self.converter_map.get(element.tag());
         let conversion_context = ConversionContext::new(element);
         if let Some(converter) = converter {
@@ -78,15 +95,7 @@ impl HtmlExporter {
                 .insert(element.tag().clone());
         }
         for child in element.children() {
-            match child {
-                Value::Element(element) => {
-                    self.export_element(write, element)?;
-                }
-                Value::String(text) => {
-                    let mut writer = IoWriter(&mut write);
-                    escape_html_body_text(&mut writer, text)?;
-                }
-            }
+            self.export_value_to_html(write, child)?;
         }
         if let Some(converter) = converter {
             converter.emit_after(write, &conversion_context)?;

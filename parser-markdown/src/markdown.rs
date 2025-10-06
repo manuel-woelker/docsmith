@@ -4,7 +4,8 @@ use docsmith_model::element::Element;
 use docsmith_model::key::Key;
 use docsmith_model::value::Value;
 use docsmith_model::{attributes, tags};
-use pulldown_cmark::{CodeBlockKind, Event, MetadataBlockKind, Options, Tag};
+use pulldown_cmark::{CodeBlockKind, Event, MetadataBlockKind, OffsetIter, Options, Tag};
+use std::iter::Peekable;
 
 pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
     let mut options = Options::empty();
@@ -14,9 +15,79 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
     options.insert(Options::ENABLE_DEFINITION_LIST);
     options.insert(Options::ENABLE_YAML_STYLE_METADATA_BLOCKS);
     let parser = pulldown_cmark::Parser::new_ext(markdown, options);
+    let mut iter = parser.into_offset_iter().peekable();
+    let mut root = parse_markdown_stack(&mut iter)?;
+    if iter.next().is_some() {
+        bail!("Unexpected event after root element");
+    }
+    // convert metadata
+    root.walk_mut(|element| {
+        if element.tag() == &tags::METADATA {
+            let mut metadata_string = String::new();
+            let children = std::mem::take(element.children_mut());
+            for child in children {
+                if let Value::String(str) = child {
+                    metadata_string.push_str(&str);
+                } else {
+                    bail!("Found non-string child in metadata block: {:?}", child)
+                }
+            }
+            let mut key_maybe = None;
+            let parser = saphyr_parser::Parser::new_from_str(&metadata_string);
+            let mut mapping_depth = 0;
+            for event in parser {
+                let (event, _span) = event?;
+                use saphyr_parser::Event;
+                match event {
+                    Event::Nothing => {}
+                    Event::StreamStart => {}
+                    Event::StreamEnd => {}
+                    Event::DocumentStart(_) => {}
+                    Event::DocumentEnd => {}
+                    Event::Alias(_) => {}
+                    Event::Scalar(value, _, _, _) => {
+                        if mapping_depth != 1 {
+                            bail!(
+                                "Unexpected mapping depth in YAML frontmatter: {:?}",
+                                metadata_string
+                            );
+                        }
+                        if let Some(key) = key_maybe {
+                            element.set_attribute(key, Value::String(value.to_string()));
+                            key_maybe = None;
+                        } else {
+                            key_maybe = Some(Key::from(value.to_string()));
+                        }
+                    }
+                    Event::SequenceStart(_, _) => {}
+                    Event::SequenceEnd => {}
+                    Event::MappingStart(_, _) => {
+                        mapping_depth += 1;
+                    }
+                    Event::MappingEnd => {
+                        mapping_depth -= 1;
+                    }
+                }
+            }
+        }
+        Ok(())
+    })?;
+    Ok(root)
+}
+
+pub fn parse_markdown_stack(parser: &mut Peekable<OffsetIter>) -> DocsmithResult<Element> {
     let root = tags::DOCUMENT.new_element();
     let mut stack = vec![root];
-    for (event, range) in parser.into_offset_iter() {
+    loop {
+        if stack.len() == 1
+            && let Some((Event::End(_), _)) = parser.peek()
+        {
+            // End found
+            break;
+        }
+        let Some((event, range)) = parser.next() else {
+            break;
+        };
         match event {
             Event::Text(text) => {
                 stack
@@ -106,59 +177,7 @@ pub fn parse_markdown(markdown: &str) -> DocsmithResult<Element> {
             other => todo!("Implement {:?}", other),
         }
     }
-    let mut root = stack.pop().expect("stack empty");
-    // convert metadata
-    root.walk_mut(|element| {
-        if element.tag() == &tags::METADATA {
-            let mut metadata_string = String::new();
-            let children = std::mem::take(element.children_mut());
-            for child in children {
-                if let Value::String(str) = child {
-                    metadata_string.push_str(&str);
-                } else {
-                    bail!("Found non-string child in metadata block: {:?}", child)
-                }
-            }
-            let mut key_maybe = None;
-            let parser = saphyr_parser::Parser::new_from_str(&metadata_string);
-            let mut mapping_depth = 0;
-            for event in parser {
-                let (event, _span) = event?;
-                use saphyr_parser::Event;
-                match event {
-                    Event::Nothing => {}
-                    Event::StreamStart => {}
-                    Event::StreamEnd => {}
-                    Event::DocumentStart(_) => {}
-                    Event::DocumentEnd => {}
-                    Event::Alias(_) => {}
-                    Event::Scalar(value, _, _, _) => {
-                        if mapping_depth != 1 {
-                            bail!(
-                                "Unexpected mapping depth in YAML frontmatter: {:?}",
-                                metadata_string
-                            );
-                        }
-                        if let Some(key) = key_maybe {
-                            element.set_attribute(key, Value::String(value.to_string()));
-                            key_maybe = None;
-                        } else {
-                            key_maybe = Some(Key::from(value.to_string()));
-                        }
-                    }
-                    Event::SequenceStart(_, _) => {}
-                    Event::SequenceEnd => {}
-                    Event::MappingStart(_, _) => {
-                        mapping_depth += 1;
-                    }
-                    Event::MappingEnd => {
-                        mapping_depth -= 1;
-                    }
-                }
-            }
-        }
-        Ok(())
-    })?;
+    let root = stack.pop().expect("stack empty");
     Ok(root)
 }
 

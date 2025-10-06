@@ -29,6 +29,6 @@ fn main() {
             "target/rust-embedded-book.html",
         )
         .unwrap();
-    let duration = start.elapsed();
-    println!("Duration: {} ms", duration.as_millis());
+    let docsmith_cli = start.elapsed();
+    info!("Duration: {} ms", docsmith_cli.as_millis());
 }

@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Span {
     pub file_index: usize,
     pub start: usize,

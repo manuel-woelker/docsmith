@@ -1,4 +1,6 @@
 pub mod attributes;
+pub mod book;
+pub mod chapter;
 pub mod element;
 pub mod exporter;
 pub mod key;
