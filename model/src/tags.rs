@@ -11,6 +11,8 @@ pub const ARTICLE: Key = Key::from_static("article");
 
 // Block types ---------------------------
 
+/// A chapter in a book
+pub const CHAPTER: Key = Key::from_static("chapter");
 /// A chapter or section heading
 pub const HEADING: Key = Key::from_static("heading");
 /// A paragraph of text
@@ -23,6 +25,13 @@ pub const ITEM: Key = Key::from_static("item");
 pub const CODE_BLOCK: Key = Key::from_static("code-block");
 /// A quote
 pub const QUOTE: Key = Key::from_static("quote");
+/// An inline image
+pub const IMAGE: Key = Key::from_static("image");
+
+// Table Types
+
+/// A table
+pub const TABLE: Key = Key::from_static("table");
 
 // Inline types
 

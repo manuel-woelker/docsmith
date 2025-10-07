@@ -139,6 +139,18 @@ pub fn parse_markdown_stack(parser: &mut Peekable<OffsetIter>) -> DocsmithResult
                             .set_attribute(attributes::CODEBLOCK_LANGUAGE, language.into_string());
                         tags::CODE_BLOCK
                     }
+                    Tag::Table(_) | Tag::TableHead | Tag::TableRow | Tag::TableCell => {
+                        // TODO: Implement table
+                        tags::TABLE
+                    }
+                    Tag::Image { .. } => {
+                        // TODO: Implement Image
+                        tags::IMAGE
+                    }
+                    Tag::BlockQuote(_) => {
+                        // TODO: Implement blockquote
+                        tags::QUOTE
+                    }
                     _ => todo!("Implement tag: {:?}", tag),
                 };
                 element.set_tag(tag);
@@ -156,10 +168,16 @@ pub fn parse_markdown_stack(parser: &mut Peekable<OffsetIter>) -> DocsmithResult
                 dbg!(event);
             }
             Event::SoftBreak => {
+                //dbg!(event);
+            }
+            Event::HardBreak => {
                 dbg!(event);
             }
-            Event::Html(html) => {
-                dbg!(html);
+            Event::Html(_html) => {
+                //dbg!(html);
+            }
+            Event::InlineHtml(_html) => {
+                //dbg!(html);
             }
             Event::Code(code) => {
                 let mut element = tags::CODE.new_element();

@@ -22,7 +22,7 @@ fn main() {
     for unhandled_tag in exporter.unhandled_tags() {
         println!("Unhandled tag: {}", unhandled_tag);
     }*/
-    let transformer = Transformer::new(PalReal::new());
+    let mut transformer = Transformer::new(PalReal::new());
     transformer
         .transform_book(
             "sample-documents/rust-embedded-book/src/SUMMARY.md",

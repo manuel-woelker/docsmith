@@ -3,7 +3,7 @@ use docsmith_base::result::DocsmithResult;
 use std::borrow::Cow;
 use std::io::Write;
 
-const CSS: &str = include_str!("css/pico.classless.jade.css");
+pub const PICO_CSS: &str = include_str!("css/pico.classless.jade.css");
 
 #[derive(Default)]
 pub struct ConvertDocument {
@@ -13,7 +13,7 @@ pub struct ConvertDocument {
 impl ConvertDocument {
     pub fn new() -> Self {
         Self {
-            css: Some(Cow::Borrowed(CSS)),
+            css: Some(Cow::Borrowed(PICO_CSS)),
         }
     }
 
