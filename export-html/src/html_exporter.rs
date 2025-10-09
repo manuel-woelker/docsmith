@@ -40,6 +40,7 @@ impl HtmlExporter {
         register_tag(tags::CODE, "code");
         register_tag(tags::LIST, "ul");
         register_tag(tags::ITEM, "li");
+        register_tag(tags::TITLE, "<title>");
         exporter
     }
 

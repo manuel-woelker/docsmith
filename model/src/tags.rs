@@ -12,6 +12,8 @@ pub const ARTICLE: Key = Key::from_static("article");
 // Block types ---------------------------
 
 /// A chapter in a book
+pub const TITLE: Key = Key::from_static("title");
+/// A chapter in a book
 pub const CHAPTER: Key = Key::from_static("chapter");
 /// A chapter or section heading
 pub const HEADING: Key = Key::from_static("heading");

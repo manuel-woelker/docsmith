@@ -4,10 +4,10 @@ use docsmith_export_html::convert_document::PICO_CSS;
 use docsmith_export_html::html_exporter::HtmlExporter;
 use docsmith_model::book::Book;
 use docsmith_model::chapter::Chapter;
-use docsmith_model::element::Element;
 use docsmith_model::tags;
 use docsmith_model::value::Value;
 use docsmith_pal::{FilePath, Pal, PalBox};
+use docsmith_parser_markdown::book_toml::parse_book_toml;
 use docsmith_parser_markdown::markdown::parse_markdown;
 use docsmith_parser_markdown::summary::{SummaryEntry, parse_summary};
 use std::io::{Read, Write};
@@ -30,11 +30,17 @@ impl Transformer {
 
     pub fn transform_book(
         &mut self,
-        summary_path: impl Into<FilePath>,
+        path: impl Into<FilePath>,
         output_path: impl Into<FilePath>,
     ) -> DocsmithResult<()> {
+        let path = path.into();
+        let book_path = path.join("book.toml");
+        let mut book_file = self.pal.read_file(&book_path)?;
+        let mut book_content = String::new();
+        book_file.read_to_string(&mut book_content)?;
+        let mut book = parse_book_toml(&book_content)?;
+        let summary_path = path.join("src/SUMMARY.md");
         let mut summary_md_content = String::new();
-        let summary_path = summary_path.into();
         self.parent_path = summary_path
             .parent()
             .ok_or_else(|| err!("Could not resolve parent of {}", summary_path))?
@@ -43,11 +49,6 @@ impl Transformer {
             .read_file(&summary_path)?
             .read_to_string(&mut summary_md_content)?;
         let summary = parse_summary(&summary_md_content)?;
-        let mut title = Element::new_tag("strong");
-        title
-            .children_mut()
-            .push(Value::new_string("Untitled docsmith book".to_string()));
-        let mut book = Book::new(title);
         for entry in summary.entries() {
             book.chapters.push(self.transform_chapter(entry)?);
         }
@@ -137,20 +138,30 @@ impl Transformer {
     }
 
     fn write_html_preamble(&self, output_file: &mut dyn Write, book: &Book) -> DocsmithResult<()> {
+        let title = &book.title;
         writeln!(
             output_file,
             r#"<!DOCTYPE html>
 <html>
     <head>
-    <title>{}</title>
+    <title>{title}</title>
     <style>
     {PICO_CSS}
     </style>
     </head>
     <body>
+    <header>
+    <h1>
     "#,
-            book.title
         )?;
+        self.exporter.export_value_to_html(output_file, title)?;
+        writeln!(output_file, "</h1>")?;
+        for author in &book.authors {
+            write!(output_file, "<em>")?;
+            self.exporter.export_value_to_html(output_file, author)?;
+            writeln!(output_file, "</em>")?;
+        }
+        writeln!(output_file, "</header>")?;
         Ok(())
     }
 

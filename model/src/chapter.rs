@@ -1,5 +1,6 @@
 use crate::value::Value;
 
+#[derive(Debug)]
 pub struct Chapter {
     pub id: String,
     pub label: Value,

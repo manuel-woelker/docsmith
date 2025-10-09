@@ -25,7 +25,7 @@ fn main() {
     let mut transformer = Transformer::new(PalReal::new());
     transformer
         .transform_book(
-            "sample-documents/rust-embedded-book/src/SUMMARY.md",
+            "sample-documents/rust-embedded-book",
             "target/rust-embedded-book.html",
         )
         .unwrap();

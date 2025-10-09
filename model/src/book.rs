@@ -1,14 +1,15 @@
 use crate::chapter::Chapter;
-use crate::element::Element;
+use crate::value::Value;
 
+#[derive(Debug)]
 pub struct Book {
-    pub title: Element,
-    pub authors: Vec<String>,
+    pub title: Value,
+    pub authors: Vec<Value>,
     pub chapters: Vec<Chapter>,
 }
 
 impl Book {
-    pub fn new(title: Element) -> Book {
+    pub fn new(title: Value) -> Book {
         Book {
             title,
             authors: vec![],

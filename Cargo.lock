@@ -129,6 +129,7 @@ dependencies = [
  "pulldown-cmark",
  "saphyr-parser",
  "tinyjson",
+ "toml-span",
 ]
 
 [[package]]
@@ -431,6 +432,15 @@ name = "tinyjson"
 version = "2.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ab95735ea2c8fd51154d01e39cf13912a78071c2d89abc49a7ef102a7dd725a"
+
+[[package]]
+name = "toml-span"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d36acfca70d66f9b5f9c4786fec60096c3594169bf77b8d4207174dc862e6a4"
+dependencies = [
+ "smallvec",
+]
 
 [[package]]
 name = "tracing"
