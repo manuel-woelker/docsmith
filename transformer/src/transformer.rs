@@ -1,6 +1,5 @@
 use docsmith_base::error::err;
 use docsmith_base::result::DocsmithResult;
-use docsmith_export_html::convert_document::PICO_CSS;
 use docsmith_export_html::html_exporter::HtmlExporter;
 use docsmith_model::book::Book;
 use docsmith_model::chapter::Chapter;
@@ -30,16 +29,19 @@ impl Transformer {
 
     pub fn transform_book(
         &mut self,
-        path: impl Into<FilePath>,
+        input_path: impl Into<FilePath>,
         output_path: impl Into<FilePath>,
     ) -> DocsmithResult<()> {
-        let path = path.into();
-        let book_path = path.join("book.toml");
+        let input_path = input_path.into();
+        let output_path = output_path.into();
+        self.pal.remove_directory_all(&output_path)?;
+        self.pal.create_directory_all(&output_path.join("css"))?;
+        let book_path = input_path.join("book.toml");
         let mut book_file = self.pal.read_file(&book_path)?;
         let mut book_content = String::new();
         book_file.read_to_string(&mut book_content)?;
         let mut book = parse_book_toml(&book_content)?;
-        let summary_path = path.join("src/SUMMARY.md");
+        let summary_path = input_path.join("src/SUMMARY.md");
         let mut summary_md_content = String::new();
         self.parent_path = summary_path
             .parent()
@@ -52,7 +54,7 @@ impl Transformer {
         for entry in summary.entries() {
             book.chapters.push(self.transform_chapter(entry)?);
         }
-        let mut output_file = self.pal.create_file(&output_path.into())?;
+        let mut output_file = self.pal.create_file(&output_path.join("index.html"))?;
         self.write_html_preamble(&mut output_file, &book)?;
         self.write_toc(&mut output_file, &book)?;
         self.write_content(&mut output_file, &book)?;
@@ -77,11 +79,11 @@ impl Transformer {
     }
 
     fn write_toc(&self, output_file: &mut dyn Write, book: &Book) -> DocsmithResult<()> {
-        writeln!(output_file, "<ul>")?;
+        writeln!(output_file, "<div class=\"toc\"><ul>")?;
         for chapter in &book.chapters {
             self.write_toc_entry(output_file, chapter)?;
         }
-        writeln!(output_file, "</ul>")?;
+        writeln!(output_file, "</ul></div>")?;
         Ok(())
     }
 
@@ -123,8 +125,8 @@ impl Transformer {
     ) -> DocsmithResult<()> {
         writeln!(output_file, "<section>")?;
         writeln!(output_file, "<a id=\"{}\"><h{level}>", chapter.id)?;
-        self.exporter
-            .export_value_to_html(output_file, &chapter.label)?;
+        /*        self.exporter
+        .export_value_to_html(output_file, &chapter.label)?;*/
         writeln!(output_file, "<h{level}></a>",)?;
         self.exporter
             .export_value_to_html(output_file, &chapter.body)?;
@@ -145,9 +147,8 @@ impl Transformer {
 <html>
     <head>
     <title>{title}</title>
-    <style>
-    {PICO_CSS}
-    </style>
+    <link rel="stylesheet" href="../../transformer/src/css/style.css">
+    <link rel="stylesheet" href="../../transformer/src/css/layout.css">
     </head>
     <body>
     <header>

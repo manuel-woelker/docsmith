@@ -36,6 +36,19 @@ impl Pal for PalReal {
     fn create_file(&self, path: &FilePath) -> DocsmithResult<Box<dyn Write>> {
         Ok(Box::new(File::create(self.resolve_path(path)?)?))
     }
+
+    fn create_directory_all(&self, path: &FilePath) -> DocsmithResult<()> {
+        std::fs::create_dir_all(self.resolve_path(path)?)?;
+        Ok(())
+    }
+
+    fn remove_directory_all(&self, path: &FilePath) -> DocsmithResult<()> {
+        let directory = self.resolve_path(path)?;
+        if std::fs::exists(&directory)? {
+            std::fs::remove_dir_all(&directory)?;
+        }
+        Ok(())
+    }
 }
 
 impl Debug for PalReal {

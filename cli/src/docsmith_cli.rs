@@ -1,10 +1,11 @@
 use docsmith_base::logging::init_logging;
+use docsmith_base::result::DocsmithResult;
 use docsmith_pal_real::PalReal;
 use docsmith_transformer::transformer::Transformer;
 use std::time::Instant;
 use tracing::info;
 
-fn main() {
+fn main() -> DocsmithResult<()> {
     init_logging();
     info!("docsmith");
     let start = Instant::now();
@@ -23,12 +24,11 @@ fn main() {
         println!("Unhandled tag: {}", unhandled_tag);
     }*/
     let mut transformer = Transformer::new(PalReal::new());
-    transformer
-        .transform_book(
-            "sample-documents/rust-embedded-book",
-            "target/rust-embedded-book.html",
-        )
-        .unwrap();
+    transformer.transform_book(
+        "sample-documents/rust-embedded-book",
+        "target/rust-embedded-book",
+    )?;
     let docsmith_cli = start.elapsed();
     info!("Duration: {} ms", docsmith_cli.as_millis());
+    Ok(())
 }

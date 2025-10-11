@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["base", "cli", "transformer", "export-html", "pal_mock", "model", "pal", "pal_mock", "parser-markdown", "pal_real"]
+members = ["base", "cli", "transformer", "export-html", "pal_mock", "model", "pal", "pal_mock", "parser-markdown", "pal_real", "server"]
 
 
 [workspace.dependencies]

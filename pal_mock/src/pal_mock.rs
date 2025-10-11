@@ -64,6 +64,14 @@ impl Pal for PalMock {
     fn create_file(&self, _path: &FilePath) -> DocsmithResult<Box<dyn Write>> {
         todo!()
     }
+
+    fn create_directory_all(&self, path: &FilePath) -> DocsmithResult<()> {
+        todo!()
+    }
+
+    fn remove_directory_all(&self, path: &FilePath) -> DocsmithResult<()> {
+        todo!()
+    }
 }
 
 impl Debug for PalMock {
