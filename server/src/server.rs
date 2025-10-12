@@ -1,104 +1,91 @@
-use crate::server_error::ServerError;
-use axum::Router;
-use axum::routing::get;
+use crate::http_types::HttpRequest;
+use crate::live_service::LiveService;
+use chunked_transfer::Encoder;
+use docsmith_base::error::err;
 use docsmith_base::result::DocsmithResult;
-use http::{Response, StatusCode};
-use std::borrow::Cow;
-use std::convert::Infallible;
+use docsmith_pal::{Pal, PalBox};
+use std::io::Write;
+use std::sync::Arc;
 use std::time::Duration;
-use axum::response::Sse;
-use axum::response::sse::{Event, KeepAlive};
-use futures_util::Stream;
-use tokio_stream::StreamExt as _ ;
-use futures_util::stream::{self};
-use tokio::sync::broadcast;
-use tokio::{task, time};
-use tokio_stream::wrappers::{BroadcastStream, ReceiverStream};
+use tiny_http::{Header, Response, Server, StatusCode};
 
-pub struct DocsmithServer {}
-
-const LIVE_SERVICE_HTML: &str = include_str!("assets/live_service.html");
-const LIVE_SERVICE_JS: &str = include_str!("assets/live_service.js");
+pub struct DocsmithServer {
+    pal: PalBox,
+}
 
 impl DocsmithServer {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(pal: impl Pal + 'static) -> Self {
+        Self { pal: Arc::new(pal) }
     }
 
-    pub async fn run(self) -> DocsmithResult<()> {
-        let (tx, mut rx1) = broadcast::channel::<String>(16);
-        let tx2 = tx.clone();
-        // build our application with a single route
-        //        let app = Router::new().route("/", get(index_handler));
-        let app = Router::new()
-            .route(
-                "/",
-                get(async || -> Result<_, ServerError> {
-                    Ok(Response::builder()
-                        .status(StatusCode::OK)
-                        .body(Cow::Borrowed(LIVE_SERVICE_HTML).to_string())?)
-                }),
-            )
-            .route(
-                "/live_service.js",
-                get(async || -> Result<_, ServerError> {
-                    Ok(Response::builder()
-                        .status(StatusCode::OK)
-                        .body(Cow::Borrowed(LIVE_SERVICE_JS).to_string())?)
-                }),
-            )
-            .route(
-                "/events2",
-                get(sse_handler),
-            )
-            .route(
-                "/events",
-                get(async move || -> Result<Sse<_>, ServerError> {
-                    // A `Stream` that repeats an event every second
-                    let rx = tx.subscribe();
-                    let receiver_stream = BroadcastStream::new(rx);
-                    let stream = receiver_stream.map(|result| {
-                        result.map(|data| Event::default().data(data))
-                    });
-/*                    let stream = stream::repeat_with(|| Event::default().data("hi!"))
-                        .map(Ok::<Event, Infallible>)
-                        .throttle(Duration::from_secs(1));*/
+    pub fn run(self) -> DocsmithResult<()> {
+        let live_service = LiveService::new(self.pal.clone());
+        let server = Server::http("0.0.0.0:3333").map_err(|e| err!(e))?;
+        let _server_thread = std::thread::Builder::new()
+            .name("HTTP server (3333)".to_string())
+            .spawn(move || {
+                loop {
+                    let tiny_request = server.recv();
+                    let tiny_request = match tiny_request {
+                        Ok(tiny_request) => tiny_request,
+                        Err(e) => {
+                            eprintln!("Error receiving request: {}", e);
+                            continue;
+                        }
+                    };
+                    if tiny_request.url() == "/events" {
+                        std::thread::Builder::new()
+                            .name("events sender".to_string())
+                            .spawn(move || {
+                                let mut writer = tiny_request.into_writer();
 
-                    Ok(Sse::new(stream).keep_alive(KeepAlive::default()))
-                }),
-            );
-
-        task::spawn(async move {
-            let mut interval = time::interval(Duration::from_millis(1000));
-            let mut i = 0;
-            loop {
-                interval.tick().await;
-                println!("tick {i}");
-                tx2.send(format!("tick {i}")).unwrap();
-                i += 1;
-            }
-        });
-        // run our app with hyper, listening globally on port 3333
-        let listener = tokio::net::TcpListener::bind("0.0.0.0:3333").await?;
-        axum::serve(listener, app).await?;
+                                (write!(writer, "HTTP/1.1 200 OK\r\n")).unwrap();
+                                (write!(writer, "Content-Type: text/event-stream\r\n")).unwrap();
+                                (write!(writer, "Transfer-Encoding: Chunked\r\n")).unwrap();
+                                (write!(writer, "Connection: keep-alive\r\n")).unwrap();
+                                (write!(writer, "\r\n")).unwrap();
+                                writer.flush().unwrap();
+                                let mut writer = Encoder::new(writer);
+                                let mut counter = 0;
+                                loop {
+                                    write!(writer, "data: foobar {counter}\n\n").unwrap();
+                                    writer.flush().unwrap();
+                                    writer.get_mut().flush().unwrap();
+                                    counter += 1;
+                                    std::thread::sleep(Duration::from_millis(1000));
+                                }
+                            })
+                            .unwrap();
+                        continue;
+                    }
+                    let request = HttpRequest {
+                        url: tiny_request.url().to_string(),
+                    };
+                    let result = match live_service.handle_request(&request) {
+                        Ok(response) => {
+                            let mut tiny_response =
+                                Response::new_empty(StatusCode(response.status));
+                            for (key, value) in response.headers {
+                                tiny_response.add_header(
+                                    Header::from_bytes(key.as_bytes(), value.as_bytes()).unwrap(),
+                                );
+                            }
+                            let tiny_response = tiny_response.with_data(response.body, None);
+                            tiny_request.respond(tiny_response)
+                        }
+                        Err(e) => {
+                            eprintln!("Error handling request: {}", e);
+                            let tiny_response = Response::from_string("Internal server error");
+                            tiny_request.respond(tiny_response)
+                        }
+                    };
+                    if let Err(e) = result {
+                        eprintln!("Error sending response: {}", e);
+                        continue;
+                    };
+                }
+            });
 
         Ok(())
     }
-}
-
-/*
-#[axum::debug_handler]
-async fn index_handler() -> Result<Response<String>, ServerError> {
-    Ok(Response::builder().status(StatusCode::OK).body("Hi, World!".to_string())?)
-}
-
- */
-
-async fn sse_handler() -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, ServerError> {
-    // A `Stream` that repeats an event every second
-    let stream = stream::repeat_with(|| Event::default().data("hi!"))
-        .map(Ok)
-        .throttle(Duration::from_secs(1));
-
-    Ok(Sse::new(stream).keep_alive(KeepAlive::default()))
 }

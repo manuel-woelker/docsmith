@@ -7,15 +7,13 @@ edition = "2024"
 docsmith-base = {version = "0.1.0", path = "../base"}
 docsmith-model = {version = "0.1.0", path = "../model"}
 docsmith-pal = {version = "0.1.0", path = "../pal"}
+docsmith-pal-real = {version = "0.1.0", path = "../pal_real"}
 docsmith-parser-markdown = {version = "0.1.0", path = "../parser-markdown"}
 docsmith-export-html = {version = "0.1.0", path = "../export-html"}
 docsmith-transformer = {version = "0.1.0", path = "../transformer"}
 tracing = "0.1.37"
-tokio = {version = "1.47.1", features = ["rt-multi-thread", "sync"]}
-axum = {version = "0.8.6", features = ["macros"]}
-http = "1.3.1"
-tokio-stream = { version = "0.1.17", features = ["sync"]}
-futures-util = "0.3.31"
+tiny_http = "0.12.0"
+chunked_transfer = "1.5.0"
 
 [dev-dependencies]
 expect-test = { workspace = true }

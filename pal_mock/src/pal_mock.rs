@@ -65,11 +65,11 @@ impl Pal for PalMock {
         todo!()
     }
 
-    fn create_directory_all(&self, path: &FilePath) -> DocsmithResult<()> {
+    fn create_directory_all(&self, _path: &FilePath) -> DocsmithResult<()> {
         todo!()
     }
 
-    fn remove_directory_all(&self, path: &FilePath) -> DocsmithResult<()> {
+    fn remove_directory_all(&self, _path: &FilePath) -> DocsmithResult<()> {
         todo!()
     }
 }

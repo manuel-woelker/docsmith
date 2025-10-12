@@ -2,12 +2,12 @@ use docsmith_base::result::DocsmithResult;
 use relative_path::RelativePathBuf;
 use std::fmt::Debug;
 use std::io::{Read, Write};
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub type FilePath = RelativePathBuf;
 
 // Platform abstraction layer used to decouple logic from the underlying platform
-pub trait Pal: Debug + 'static {
+pub trait Pal: Debug + Sync + Send + 'static {
     /// Read a file, the path is relative to the base directory
     fn read_file(&self, path: &FilePath) -> DocsmithResult<Box<dyn Read + 'static>>;
 
@@ -21,4 +21,4 @@ pub trait Pal: Debug + 'static {
     fn remove_directory_all(&self, path: &FilePath) -> DocsmithResult<()>;
 }
 
-pub type PalBox = Rc<dyn Pal>;
+pub type PalBox = Arc<dyn Pal>;

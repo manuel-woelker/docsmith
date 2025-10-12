@@ -10,7 +10,7 @@ use docsmith_parser_markdown::book_toml::parse_book_toml;
 use docsmith_parser_markdown::markdown::parse_markdown;
 use docsmith_parser_markdown::summary::{SummaryEntry, parse_summary};
 use std::io::{Read, Write};
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct Transformer {
     pal: PalBox,
@@ -21,7 +21,7 @@ pub struct Transformer {
 impl Transformer {
     pub fn new(pal: impl Pal) -> Self {
         Self {
-            pal: Rc::new(pal),
+            pal: Arc::new(pal),
             exporter: HtmlExporter::new(),
             parent_path: FilePath::from("."),
         }

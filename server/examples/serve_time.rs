@@ -1,12 +1,11 @@
+use docsmith_pal_real::PalReal;
 use docsmith_server::server::DocsmithServer;
 
 fn main() {
-    tokio::runtime::Runtime::new().unwrap().block_on(async_main());
-}
-
-async fn async_main() {
-    let result = DocsmithServer::new().run().await;
+    let pal = PalReal::new();
+    let result = DocsmithServer::new(pal).run();
     if let Err(e) = result {
         eprintln!("Error: {}", e);
     }
+    std::thread::park()
 }
